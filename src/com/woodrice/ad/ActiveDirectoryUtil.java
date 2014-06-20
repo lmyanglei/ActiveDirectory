@@ -12,7 +12,10 @@ import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
+import javax.naming.directory.BasicAttribute;
+import javax.naming.directory.BasicAttributes;
 import javax.naming.directory.DirContext;
+import javax.naming.directory.ModificationItem;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 import javax.naming.ldap.InitialLdapContext;
@@ -102,6 +105,66 @@ public class ActiveDirectoryUtil {
 		if(null != distinguishedName && !"".equals(distinguishedName)){
 			returnValue = true;
         }
+		
+		return returnValue;
+	}
+	
+	/**
+	 * 添加用户
+	 * 
+	 * @param userName 用户姓名
+	 * @param userID 用户帐号
+	 * @param password 用户密码
+	 * @param employeeID 员工ID
+	 * @return true:成功；false:失败
+	 */
+	public boolean addUser(String userName, String userID, String password, String employeeID){
+		boolean returnValue = false;
+		
+		try{
+			String cnUserName = "cn="+userID;
+			
+	        Attributes attrs = new BasicAttributes(true);   
+
+	        attrs.put("objectClass", "user");   
+	        
+	        attrs.put("cn", userID);   
+	        attrs.put("sAMAccountName", userID);
+	        
+	        attrs.put("sn", userName);
+	        attrs.put("name", userName);
+	        attrs.put("displayName", userName);
+	        attrs.put("employeeid", employeeID);
+	        attrs.put("description", userID+"-"+userName+"-"+employeeID);
+	        attrs.put("userPrincipalName", userID+"@"+domainSuffix);   
+	        
+	        attrs.put("userAccountControl", Integer.toString(UF_NORMAL_ACCOUNT   
+	                + UF_PASSWD_NOTREQD + UF_PASSWORD_EXPIRED + UF_ACCOUNTDISABLE));   
+	  
+	        // Create the context   
+	        Context result = ldapContext.createSubcontext(cnUserName,attrs);   
+	  
+	        ModificationItem[] mods = new ModificationItem[2];   
+	  
+	        // Replace the "unicdodePwd" attribute with a new value   
+	        // Password must be both Unicode and a quoted string   
+	        String newQuotedPassword = "\""+password+"\"";   
+	        byte[] newUnicodePassword = newQuotedPassword.getBytes("UTF-16LE");   
+	  
+	        mods[0] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE,   
+	                new BasicAttribute("unicodePwd", newUnicodePassword));   
+	        mods[1] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE,   
+	                new BasicAttribute("userAccountControl", Integer   
+	                        .toString(UF_NORMAL_ACCOUNT + UF_PASSWORD_EXPIRED)));   
+	  
+	        // Perform the update   
+	        ldapContext.modifyAttributes(cnUserName, mods);   
+
+	        returnValue = true;
+	        
+		}catch(Exception e){
+			e.printStackTrace();
+		}
 		
 		return returnValue;
 	}
