@@ -15,5 +15,7 @@ public class UserIsExist {
 				System.out.println("用户不存在");
 			}
 		}
+
+		adUtil.release();
 	}
 }

@@ -15,5 +15,7 @@ public class ModifyPassword {
 				System.out.println("ĞŞ¸ÄÃÜÂëÊ§°Ü");
 			}
 		}
+
+		adUtil.release();
 	}
 }

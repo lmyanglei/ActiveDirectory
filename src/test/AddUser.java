@@ -15,5 +15,7 @@ public class AddUser {
 				System.out.println("ÃÌº””√ªß ß∞‹");
 			}
 		}
+		
+		adUtil.release();
 	}
 }

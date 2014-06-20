@@ -15,5 +15,7 @@ public class RemoveUser {
 				System.out.println("É¾³ıÓÃ»§Ê§°Ü");
 			}
 		}
+
+		adUtil.release();
 	}
 }
