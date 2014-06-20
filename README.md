@@ -5,13 +5,13 @@ java ldap Active Directory
 
 使用java操作Active Directory
 
-实现了以下功能：
+* 实现了以下功能：
 1、校验用户是否已经存在
 2、添加用户
 3、删除用户
 4、修改用户密码
 
-证书：
+* 证书：
 实际使用时，需要证书
 1、代码中使用以下代码加载证书
 System.setProperty("javax.net.ssl.trustStore", keystore);   
