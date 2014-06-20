@@ -16,6 +16,7 @@ ActiveDirectory
 System.setProperty("javax.net.ssl.trustStore", keystore);
 System.setProperty("javax.net.ssl.trustStorePassword", keyPassword);
 ```
+ceshi
     * 首先由AD办法一个根证书，形如：*.cer
     * 使用keytool将*.cer导出为*.keystore类型的文件供代码加载
     * 加载证书有两种方式
