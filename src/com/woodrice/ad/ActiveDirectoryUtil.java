@@ -92,6 +92,25 @@ public class ActiveDirectoryUtil {
 	}
 	
 	/**
+	 * 获取除域之外的用户DN
+	 * @param userid
+	 * @return
+	 */
+	public String getUserName(String userid){
+		String returnValue = "";
+
+        try { 
+        	String userDN = getUserDN(userid);
+	        
+        	returnValue = userDN.replace(replaceSuffix, "");
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+		return returnValue;
+	}
+	
+	/**
 	 * 查找是否存在用户
 	 * 
 	 * @param userID 用户名
@@ -164,6 +183,26 @@ public class ActiveDirectoryUtil {
 	        
 		}catch(Exception e){
 			e.printStackTrace();
+		}
+		
+		return returnValue;
+	}
+	
+	/**
+	 * 删除用户
+	 * 
+	 * @param userID
+	 * @return
+	 */
+	public boolean removeUser(String userID){
+		boolean returnValue = false;
+		
+		try{
+			String userDN = getUserName(userID);
+			ldapContext.destroySubcontext(userDN); 
+			returnValue = true;
+		}catch(Exception e){
+			e.printStackTrace(System.err);
 		}
 		
 		return returnValue;
