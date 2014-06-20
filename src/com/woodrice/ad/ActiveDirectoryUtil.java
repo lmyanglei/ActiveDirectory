@@ -29,7 +29,7 @@ import javax.naming.ldap.LdapContext;
  * @Package com.woodrice.ad
  * @Description: ActiveDirectory
  * @author lmyanglei@gmail.com
- * @date 2014-6-20 14:28:01
+ * @date 2014-1-20 14:28:01
  * @Copyright: 2014 woodrice.com All rights reserved.
  * @version v1.0  
  */
@@ -208,6 +208,50 @@ public class ActiveDirectoryUtil {
 		return returnValue;
 	}
 	
+	public boolean modifyPassword(String userID,String oldPassword,String newPassword){
+		boolean returnValue = false;
+		
+		try{
+			ModificationItem[] mods = new ModificationItem[2]; 
+	        String oldQuotedPassword = "\"" + oldPassword + "\"";
+	        byte[] oldUnicodePassword = oldQuotedPassword.getBytes("UTF-16LE"); 
+	        String newQuotedPassword = "\"" + newPassword + "\"";
+	        byte[] newUnicodePassword = newQuotedPassword.getBytes("UTF-16LE"); 
+	        //mods[0] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, new BasicAttribute("unicodePwd", newUnicodePassword));
+	        mods[0] = new ModificationItem(DirContext.REMOVE_ATTRIBUTE, new BasicAttribute("unicodePwd", oldUnicodePassword));            
+	        mods[1] = new ModificationItem(DirContext.ADD_ATTRIBUTE, new BasicAttribute("unicodePwd", newUnicodePassword));            
+
+	        //查找某一个用户信息
+	        String returnedAtts[] = { "distinguishedName" };
+	        
+	        String searchFilter = "(&(objectClass=user)(cn="+userID+"))";
+	        SearchControls searchCtls = new SearchControls();
+	        searchCtls.setSearchScope(SearchControls.SUBTREE_SCOPE);
+	        searchCtls.setReturningAttributes(returnedAtts);
+	        NamingEnumeration answer = ldapContext.search("", searchFilter,searchCtls);
+	        if (answer.hasMoreElements()) {
+				SearchResult sr = (SearchResult) answer.next();
+				Attributes attrs = sr.getAttributes();
+				if (attrs != null) {
+					NamingEnumeration ae = attrs.getAll();
+					Attribute attr = (Attribute) ae.next();
+					NamingEnumeration e = attr.getAll();
+					String userName = (String) e.next();
+					if(userName != null && userName.indexOf("DC=") > 0) {
+						userName = userName.substring(0, userName.indexOf("DC=")-1);
+					}
+					//修改密码
+					ldapContext.modifyAttributes(userName,mods);
+				}
+	        }
+	        
+	        returnValue = true;
+		}catch(Exception e){
+			e.printStackTrace(System.err);
+		}
+		
+		return returnValue;
+	}
 	/**
 	 * config file
 	 * 
